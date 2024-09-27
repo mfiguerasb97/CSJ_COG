@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <title>Semàfor del Comportament</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            font-size: 24px;
+        }
+        .behaviour-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 20px 0;
+        }
+        .emoji {
+            width: 64px;
+            height: 64px;
+            margin-right: 10px;
+        }
+        .button {
+            font-size: 24px;
+            padding: 20px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .green {
+            background-color: green;
+        }
+        .yellow {
+            background-color: gold;
+        }
+        .red {
+            background-color: red;
+        }
+        .clear-history-button {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-size: 18px;
+        }
+        .button-container {
+            margin-top: 30px;
+        }
+        .delete-icon {
+            margin-left: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Semàfor del Comportament</h1>
+    
+    <label for="name">Selecciona el teu nom:</label>
+    <select id="name" style="font-size: 24px;">
+        <!-- Llista completa de nens i nenes -->
+        <option value="Danna Montserrat Alvarado">Danna Montserrat Alvarado</option>
+        <option value="Leyre Masi Balderrama">Leyre Masi Balderrama</option>
+        <option value="Ithaissa Culebras Tomás">Ithaissa Culebras Tomás</option>
+        <option value="Amir Carmona Izagouaghen">Amir Carmona Izagouaghen</option>
+        <option value="Yulia Luyana Duron Medina">Yulia Luyana Duron Medina</option>
+        <option value="Nour Bakkali">Nour Bakkali</option>
+        <option value="Martina Carmona Izagouaghen">Martina Carmona Izagouaghen</option>
+        <option value="Lina Moreno Fioué">Lina Moreno Fioué</option>
+        <option value="Yasmin Moreno Fioué">Yasmin Moreno Fioué</option>
+        <option value="Nidal Ben Yessef">Nidal Ben Yessef</option>
+        <option value="Elian Martínez Pérez">Elian Martínez Pérez</option>
+        <option value="Dayara Villanueva Toribio">Dayara Villanueva Toribio</option>
+        <option value="Ángel Pérez Molina">Ángel Pérez Molina</option>
+        <option value="Genesis Plaza García">Genesis Plaza García</option>
+        <option value="Nayara Reinoso González">Nayara Reinoso González</option>
+        <option value="Carla Sanchez Fuentes">Carla Sanchez Fuentes</option>
+        <option value="Edi Sanz Abadia">Edi Sanz Abadia</option>
+        <option value="Aymane Toro">Aymane Toro</option>
+        <option value="Nen 20">Nen 20</option>
+        <!-- Afegeix la resta dels noms aquí -->
+    </select>
+    <button onclick="registerName()" style="font-size: 24px;">Entrar</button>
+
+    <div id="comportament-section" style="display:none;">
+        <h2 id="welcome-message"></h2>
+        <p>Com t'has portat avui?</p>
+        
+        <!-- Botons amb icones de semàfor -->
+        <div class="behaviour-buttons">
+            <button onclick="setComportament('verd')" class="button green">
+                M'he portat molt bé 😁
+            </button>
+            <button onclick="setComportament('groc')" class="button yellow">
+                Puc millorar una mica el meu comportament 😐
+            </button>
+            <button onclick="setComportament('vermell')" class="button red">
+                Encara he de millorar molt el meu comportament 😠
+            </button>
+        </div>
+
+        <h3>Històric de comportament:</h3>
+        <ul id="comportament-log"></ul>
+
+        <button onclick="clearHistory()" class="clear-history-button">Esborrar historial</button>
+
+        <div class="button-container">
+            <button onclick="exportToExcel()" style="font-size: 24px;">Exportar a Excel</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script>
+        function registerName() {
+            const name = document.getElementById('name').value;
+            document.getElementById('welcome-message').innerText = 'Benvingut/da, ' + name;
+            document.getElementById('comportament-section').style.display = 'block';
+            loadComportamentLog(name);
+        }
+
+        function setComportament(color) {
+            const name = document.getElementById('name').value;
+            const date = new Date().toLocaleDateString();
+            const comportamentData = JSON.parse(localStorage.getItem(name)) || [];
+
+            comportamentData.push({ date, color });
+            localStorage.setItem(name, JSON.stringify(comportamentData));
+            loadComportamentLog(name);
+        }
+
+        function loadComportamentLog(name) {
+            const comportamentLog = JSON.parse(localStorage.getItem(name)) || [];
+            const logList = document.getElementById('comportament-log');
+            logList.innerHTML = ''; // Esborra l'històric anterior
+
+            comportamentLog.forEach((entry, index) => {
+                const listItem = document.createElement('li');
+                let emoji = '';
+
+                // Afegim emoticones en funció del color seleccionat
+                if (entry.color === 'verd') emoji = '🟢 M\'he portat molt bé 😁';
+                else if (entry.color === 'groc') emoji = '🟡 Puc millorar una mica el meu comportament 😐';
+                else if (entry.color === 'vermell') emoji = '🔴 Encara he de millorar molt el meu comportament 😠';
+
+                listItem.innerHTML = `Data: ${entry.date}, Valoració: <span class="emoji">${emoji}</span>`;
+
+                // Afegir icona de brossa per eliminar l'entrada
+                const deleteIcon = document.createElement('img');
+                deleteIcon.src = 'https://cdn-icons-png.flaticon.com/512/1214/1214428.png'; // Icòna de brossa
+                deleteIcon.alt = 'Eliminar';
+                deleteIcon.width = 20;
+                deleteIcon.height = 20;
+                deleteIcon.classList.add('delete-icon');
+                deleteIcon.onclick = () => deleteEntry(name, index);
+
+                listItem.appendChild(deleteIcon);
+                logList.appendChild(listItem);
+            });
+        }
+
+        function deleteEntry(name, index) {
+            const comportamentData = JSON.parse(localStorage.getItem(name)) || [];
+            comportamentData.splice(index, 1); // Elimina l'element per l'índex
+            localStorage.setItem(name, JSON.stringify(comportamentData));
+            loadComportamentLog(name); // Recarrega la llista després de l'eliminació
+        }
+
+        function clearHistory() {
+            const name = document.getElementById('name').value;
+            localStorage.removeItem(name); // Esborra l'historial del nen seleccionat
+            loadComportamentLog(name); // Actualitza l'històric a la pantalla
+        }
+
+        function exportToExcel() {
+            const noms = [
+                "Danna Montserrat Alvarado", "Leyre Masi Balderrama", "Ithaissa Culebras Tomás","Amir Carmona Izagouaghen", "Yulia Luyana Duron Medina", "Nour Bakkali", "Amin Carmona Izagouaghen","Martina Carmona Izagouaghen","Lina Moreno Fioué","Yasmin Moreno Fioué","Nidal Ben Yessef","Elian Martínez Pérez","Dayara Villanueva Toribio","Ángel Pérez Molina","Genesis Plaza García","Nayara Reinoso González","Carla Sanchez Fuentes","Edi Sanz Abadia","Aymane Toro"
+            ];
+            const data = [];
+
+            // Recull les dades de tots els nens
+            noms.forEach(nom => {
+                const historico = JSON.parse(localStorage.getItem(nom)) || [];
+                historico.forEach(entry => {
+                    data.push({
+                        "Nom": nom,
+                        "Data": entry.date,
+                        "Valoració": entry.color
+                    });
+                });
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(data);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Comportament");
+            XLSX.writeFile(workbook, "comportament_nens.xlsx");
+        }
+    </script>
+</body>
+</html>
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+                console.log('Service Worker registered with scope:', registration.scope);
+            }, function(err) {
+                console.log('Service Worker registration failed:', err);
+            });
+        });
+    }
+</script>
