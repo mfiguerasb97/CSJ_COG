@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="ca">
 <head>
     <meta charset="UTF-8">
@@ -54,6 +54,17 @@
             margin-left: 10px;
             cursor: pointer;
         }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 10px 20px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
@@ -61,27 +72,26 @@
     
     <label for="name">Selecciona el teu nom:</label>
     <select id="name" style="font-size: 24px;">
-        <!-- Llista completa de nens i nenes -->
-        <option value="Danna Montserrat Alvarado">Danna Montserrat Alvarado</option>
-        <option value="Leyre Masi Balderrama">Leyre Masi Balderrama</option>
-        <option value="Ithaissa Culebras Tomás">Ithaissa Culebras Tomás</option>
-        <option value="Amir Carmona Izagouaghen">Amir Carmona Izagouaghen</option>
-        <option value="Yulia Luyana Duron Medina">Yulia Luyana Duron Medina</option>
-        <option value="Nour Bakkali">Nour Bakkali</option>
-        <option value="Martina Carmona Izagouaghen">Martina Carmona Izagouaghen</option>
-        <option value="Lina Moreno Fioué">Lina Moreno Fioué</option>
-        <option value="Yasmin Moreno Fioué">Yasmin Moreno Fioué</option>
-        <option value="Nidal Ben Yessef">Nidal Ben Yessef</option>
-        <option value="Elian Martínez Pérez">Elian Martínez Pérez</option>
-        <option value="Dayara Villanueva Toribio">Dayara Villanueva Toribio</option>
-        <option value="Ángel Pérez Molina">Ángel Pérez Molina</option>
-        <option value="Genesis Plaza García">Genesis Plaza García</option>
-        <option value="Nayara Reinoso González">Nayara Reinoso González</option>
-        <option value="Carla Sanchez Fuentes">Carla Sanchez Fuentes</option>
-        <option value="Edi Sanz Abadia">Edi Sanz Abadia</option>
-        <option value="Aymane Toro">Aymane Toro</option>
-        <option value="Nen 20">Nen 20</option>
-        <!-- Afegeix la resta dels noms aquí -->
+        <option value="DANNA">DANNA</option>
+        <option value="LEYRE">LEYRE</option>
+        <option value="ITHAISSA">ITHAISSA</option>
+        <option value="AMIR">AMIR</option>
+        <option value="AMIN">AMIN</option>
+        <option value="YULIA">YULIA</option>
+        <option value="NOUR">NOUR</option>
+        <option value="MARTINA">MARTINA</option>
+        <option value="LINA">LINA</option>
+        <option value="YASMIN">YASMIN</option>
+        <option value="NIDAL">NIDAL</option>
+        <option value="ELIAN">ELIAN</option>
+        <option value="DAYARA">DAYARA</option>
+        <option value="ÁNGEL">ÁNGEL</option>
+        <option value="GENESIS">GENESIS</option>
+        <option value="NAYRA">NAYRA</option>
+        <option value="CARLA">CARLA</option>
+        <option value="EDI">EDI</option>
+        <option value="AYMAN">AYMAN</option>
+        <!-- Afegir la resta de noms si cal -->
     </select>
     <button onclick="registerName()" style="font-size: 24px;">Entrar</button>
 
@@ -89,26 +99,24 @@
         <h2 id="welcome-message"></h2>
         <p>Com t'has portat avui?</p>
         
-        <!-- Botons amb icones de semàfor -->
         <div class="behaviour-buttons">
-            <button onclick="setComportament('verd')" class="button green">
-                M'he portat molt bé 😁
-            </button>
-            <button onclick="setComportament('groc')" class="button yellow">
-                Puc millorar una mica el meu comportament 😐
-            </button>
-            <button onclick="setComportament('vermell')" class="button red">
-                Encara he de millorar molt el meu comportament 😠
-            </button>
+            <button onclick="setComportament('verd')" class="button green">M'he portat molt bé 😁</button>
+            <button onclick="setComportament('groc')" class="button yellow">Puc millorar el meu comportament 😐</button>
+            <button onclick="setComportament('vermell')" class="button red">He de millorar molt el meu comportament 😠</button>
         </div>
 
         <h3>Històric de comportament:</h3>
         <ul id="comportament-log"></ul>
-
         <button onclick="clearHistory()" class="clear-history-button">Esborrar historial</button>
 
         <div class="button-container">
             <button onclick="exportToExcel()" style="font-size: 24px;">Exportar a Excel</button>
+        </div>
+
+        <h3>Resum mensual</h3>
+        <div id="summary-section"></div>
+        <div id="clear-summary-container" style="display:none;">
+            <button onclick="clearMonthlySummary()">Esborrar Resum Mensual</button>
         </div>
     </div>
 
@@ -119,6 +127,7 @@
             document.getElementById('welcome-message').innerText = 'Benvingut/da, ' + name;
             document.getElementById('comportament-section').style.display = 'block';
             loadComportamentLog(name);
+            showMonthlySummary(name); // Mostrem el resum mensual al registrar el nom
         }
 
         function setComportament(color) {
@@ -129,27 +138,26 @@
             comportamentData.push({ date, color });
             localStorage.setItem(name, JSON.stringify(comportamentData));
             loadComportamentLog(name);
+            showMonthlySummary(name); // Actualitzem el resum mensual
         }
 
         function loadComportamentLog(name) {
             const comportamentLog = JSON.parse(localStorage.getItem(name)) || [];
             const logList = document.getElementById('comportament-log');
-            logList.innerHTML = ''; // Esborra l'històric anterior
+            logList.innerHTML = '';
 
             comportamentLog.forEach((entry, index) => {
                 const listItem = document.createElement('li');
                 let emoji = '';
 
-                // Afegim emoticones en funció del color seleccionat
                 if (entry.color === 'verd') emoji = '🟢 M\'he portat molt bé 😁';
-                else if (entry.color === 'groc') emoji = '🟡 Puc millorar una mica el meu comportament 😐';
-                else if (entry.color === 'vermell') emoji = '🔴 Encara he de millorar molt el meu comportament 😠';
+                else if (entry.color === 'groc') emoji = '🟡 Puc millorar el meu comportament 😐';
+                else if (entry.color === 'vermell') emoji = '🔴 He de millorar molt el meu comportament 😠';
 
-                listItem.innerHTML = `Data: ${entry.date}, Valoració: <span class="emoji">${emoji}</span>`;
+                listItem.innerHTML = `Data: ${entry.date}, Valoració: ${emoji}`;
 
-                // Afegir icona de brossa per eliminar l'entrada
                 const deleteIcon = document.createElement('img');
-                deleteIcon.src = 'https://cdn-icons-png.flaticon.com/512/1214/1214428.png'; // Icòna de brossa
+                deleteIcon.src = 'https://cdn-icons-png.flaticon.com/512/1214/1214428.png';
                 deleteIcon.alt = 'Eliminar';
                 deleteIcon.width = 20;
                 deleteIcon.height = 20;
@@ -163,51 +171,121 @@
 
         function deleteEntry(name, index) {
             const comportamentData = JSON.parse(localStorage.getItem(name)) || [];
-            comportamentData.splice(index, 1); // Elimina l'element per l'índex
+            comportamentData.splice(index, 1);
             localStorage.setItem(name, JSON.stringify(comportamentData));
-            loadComportamentLog(name); // Recarrega la llista després de l'eliminació
+            loadComportamentLog(name);
+            showMonthlySummary(name); // Actualitzem el resum mensual
         }
 
         function clearHistory() {
             const name = document.getElementById('name').value;
-            localStorage.removeItem(name); // Esborra l'historial del nen seleccionat
-            loadComportamentLog(name); // Actualitza l'històric a la pantalla
+            localStorage.removeItem(name);
+            loadComportamentLog(name);
+            clearMonthlySummary(); // Neteja el resum mensual
         }
 
         function exportToExcel() {
             const noms = [
-                "Danna Montserrat Alvarado", "Leyre Masi Balderrama", "Ithaissa Culebras Tomás","Amir Carmona Izagouaghen", "Yulia Luyana Duron Medina", "Nour Bakkali", "Amin Carmona Izagouaghen","Martina Carmona Izagouaghen","Lina Moreno Fioué","Yasmin Moreno Fioué","Nidal Ben Yessef","Elian Martínez Pérez","Dayara Villanueva Toribio","Ángel Pérez Molina","Genesis Plaza García","Nayara Reinoso González","Carla Sanchez Fuentes","Edi Sanz Abadia","Aymane Toro"
+                "DANNA", "LEYRE", "ITAHISSA",
+                "AMIR", "YULIA", "NOUR","AMIN",
+                "MARTINA", "LINA", "YASMIN", "NIDAL",
+                "ELIAN", "DAYARA", "ÁNGEL", "GENESIS",
+                "NAYRA", "CARLA", "EDI", "AYMAN"
             ];
-            const data = [];
 
-            // Recull les dades de tots els nens
-            noms.forEach(nom => {
-                const historico = JSON.parse(localStorage.getItem(nom)) || [];
-                historico.forEach(entry => {
-                    data.push({
-                        "Nom": nom,
-                        "Data": entry.date,
-                        "Valoració": entry.color
-                    });
-                });
+            const comportamentData = noms.map(name => {
+                const data = JSON.parse(localStorage.getItem(name)) || [];
+                return data.map(entry => ({
+                    Nom: name,
+                    Data: entry.date,
+                    Color: entry.color
+                }));
+            }).flat();
+
+            const ws = XLSX.utils.json_to_sheet(comportamentData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Comportament");
+            XLSX.writeFile(wb, "comportament.xlsx");
+        }
+
+        // Funció per obtenir el resum mensual segons el mes i sumar els colors
+        function getMonthlySummary(name) {
+            const comportamentData = JSON.parse(localStorage.getItem(name)) || [];
+            const summary = {};
+
+            comportamentData.forEach(entry => {
+                const [day, month, year] = entry.date.split('/');
+                const monthYear = `${month}/${year}`;
+
+                if (!summary[monthYear]) {
+                    summary[monthYear] = { verd: 0, groc: 0, vermell: 0 };
+                }
+
+                if (entry.color === 'verd') summary[monthYear].verd++;
+                else if (entry.color === 'groc') summary[monthYear].groc++;
+                else if (entry.color === 'vermell') summary[monthYear].vermell++;
             });
 
-            const worksheet = XLSX.utils.json_to_sheet(data);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Comportament");
-            XLSX.writeFile(workbook, "comportament_nens.xlsx");
+            return summary;
+        }
+
+        // Funció per mostrar el resum mensual i sumar el total de dies verds, grocs i vermells
+        function showMonthlySummary(name) {
+            const summary = getMonthlySummary(name);
+            const summarySection = document.getElementById('summary-section');
+            summarySection.innerHTML = ''; // Neteja qualsevol taula anterior
+
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <tr>
+                    <th>Mes</th>
+                    <th>Dies verds</th>
+                    <th>Dies grocs</th>
+                    <th>Dies vermells</th>
+                </tr>
+            `;
+
+            let totalVerd = 0;
+            let totalGroc = 0;
+            let totalVermell = 0;
+
+            for (const [monthYear, counts] of Object.entries(summary)) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${monthYear}</td>
+                    <td>${counts.verd}</td>
+                    <td>${counts.groc}</td>
+                    <td>${counts.vermell}</td>
+                `;
+                table.appendChild(row);
+
+                // Sumar els totals
+                totalVerd += counts.verd;
+                totalGroc += counts.groc;
+                totalVermell += counts.vermell;
+            }
+
+            // Afegir fila de total
+            const totalRow = document.createElement('tr');
+            totalRow.innerHTML = `
+                <td><strong>Total</strong></td>
+                <td><strong>${totalVerd}</strong></td>
+                <td><strong>${totalGroc}</strong></td>
+                <td><strong>${totalVermell}</strong></td>
+            `;
+            table.appendChild(totalRow);
+
+            summarySection.appendChild(table);
+
+            // Mostrem el botó d'esborrar el resum mensual
+            document.getElementById('clear-summary-container').style.display = 'block';
+        }
+
+        function clearMonthlySummary() {
+            const summarySection = document.getElementById('summary-section');
+            summarySection.innerHTML = ''; // Neteja la taula del resum mensual
+            document.getElementById('clear-summary-container').style.display = 'none'; // Oculta el botó
         }
     </script>
 </body>
 </html>
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
-                console.log('Service Worker registered with scope:', registration.scope);
-            }, function(err) {
-                console.log('Service Worker registration failed:', err);
-            });
-        });
-    }
-</script>
